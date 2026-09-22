@@ -1,10 +1,15 @@
 using Travels.Components;
+using Microsoft.EntityFrameworkCore;
+using Travels.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents();
 
+builder.Services.AddDbContextFactory<TravelsContext>(o =>
+    o.UseSqlite("Data Source=travels.db"));
+builder.Services.AddQuickGridEntityFrameworkAdapter();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
