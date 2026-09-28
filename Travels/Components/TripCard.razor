@@ -1,0 +1,44 @@
+<div class="card mb-3">
+    @if (!string.IsNullOrEmpty(Caption))
+    {
+        <div class="card-header fw-bold">@Caption</div>
+    }
+    <div class="card-body">
+        <h5 class="card-title">@Trip.Destination</h5>
+        <p class="card-text">
+            <strong>Період:</strong> @Trip.StartDate.ToString("dd.MM.yyyy") — @Trip.EndDate.ToString("dd.MM.yyyy")<br />
+            <strong>Вартість:</strong> @Trip.TotalCost грн
+        </p>
+
+        @if (ShowDetails)
+        {
+            @if (!string.IsNullOrEmpty(Trip.Description))
+            {
+                <p class="card-text"><strong>Опис:</strong> @Trip.Description</p>
+            }
+            <p class="card-text">
+                <strong>Статус:</strong> @Trip.Status
+            </p>
+        }
+
+        @if (Trip.IsBusinessTrip)
+        {
+            <span class="badge bg-info text-dark">Робоче відрядження</span>
+        }
+        else
+        {
+            <span class="badge bg-success">Відпочинок</span>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Trip Trip { get; set; } = default!;
+
+    [Parameter]
+    public string? Caption { get; set; }
+
+    [Parameter]
+    public bool ShowDetails { get; set; } = true;
+}
