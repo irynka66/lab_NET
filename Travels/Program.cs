@@ -5,11 +5,14 @@ using Travels.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
 builder.Services.AddDbContextFactory<TravelsContext>(o =>
     o.UseSqlite("Data Source=travels.db"));
 builder.Services.AddQuickGridEntityFrameworkAdapter();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +28,7 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

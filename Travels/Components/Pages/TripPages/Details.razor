@@ -1,0 +1,58 @@
+@page "/trips/details"
+@using Microsoft.EntityFrameworkCore
+@using Travels.Models
+@inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Trip</h2>
+    <hr />
+    @if (trip is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Destination</dt>
+            <dd class="col-sm-10">@trip.Destination</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@trip.Description</dd>
+            <dt class="col-sm-2">StartDate</dt>
+            <dd class="col-sm-10">@trip.StartDate</dd>
+            <dt class="col-sm-2">EndDate</dt>
+            <dd class="col-sm-10">@trip.EndDate</dd>
+            <dt class="col-sm-2">TotalCost</dt>
+            <dd class="col-sm-10">@trip.TotalCost</dd>
+            <dt class="col-sm-2">IsBusinessTrip</dt>
+            <dd class="col-sm-10">@trip.IsBusinessTrip</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@trip.Status</dd>
+        </dl>
+        <div>
+            <a href="@($"/trips/edit?id={trip.Id}")">Edit</a> |
+            <a href="@($"/trips")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Trip? trip;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        trip = await context.Trips.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (trip is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+}

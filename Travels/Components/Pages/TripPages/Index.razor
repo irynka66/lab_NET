@@ -1,0 +1,59 @@
+@page "/trips"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Travels.Models
+@using Travels.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="trips/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="@context.Trips.OrderBy(b => b.Id).Skip((CurrentPage - 1) * PageSize).Take(PageSize)">
+    <PropertyColumn Property="trip => trip.Destination" />
+    <PropertyColumn Property="trip => trip.Description" />
+    <PropertyColumn Property="trip => trip.StartDate" />
+    <PropertyColumn Property="trip => trip.EndDate" />
+    <PropertyColumn Property="trip => trip.TotalCost" />
+    <PropertyColumn Property="trip => trip.IsBusinessTrip" />
+    <PropertyColumn Property="trip => trip.Status" />
+
+    <TemplateColumn Context="trip">
+        <a href="@($"trips/edit?id={trip.Id}")">Edit</a> |
+        <a href="@($"trips/details?id={trip.Id}")">Details</a> |
+        <a href="@($"trips/delete?id={trip.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<nav>
+    @if (CurrentPage > 1)
+    {
+        <a class="btn btn-outline-secondary" href="@($"trips?page={CurrentPage - 1}")">Назад</a>
+    }
+    <span class="mx-2">Сторінка @CurrentPage</span>
+    @if (context.Trips.Count() > CurrentPage * PageSize)
+    {
+        <a class="btn btn-outline-secondary" href="@($"trips?page={CurrentPage + 1}")">Далі</a>
+    }
+</nav>
+
+@code {
+
+private const int PageSize = 10;
+[SupplyParameterFromQuery] public int? Page { get; set; }
+private int CurrentPage => Page is > 0 ? Page.Value : 1;
+
+    private TravelsContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,81 @@
+@page "/trips/create"
+@using Microsoft.EntityFrameworkCore
+@using Travels.Models
+@inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Trip</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Trip" OnValidSubmit="AddTrip" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="destination" class="form-label">Destination:</label> 
+                <InputText id="destination" @bind-Value="Trip.Destination" class="form-control" /> 
+                <ValidationMessage For="() => Trip.Destination" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Trip.Description" class="form-control" /> 
+                <ValidationMessage For="() => Trip.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="startdate" class="form-label">StartDate:</label> 
+                <InputDate id="startdate" @bind-Value="Trip.StartDate" class="form-control" /> 
+                <ValidationMessage For="() => Trip.StartDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="enddate" class="form-label">EndDate:</label> 
+                <InputDate id="enddate" @bind-Value="Trip.EndDate" class="form-control" /> 
+                <ValidationMessage For="() => Trip.EndDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="totalcost" class="form-label">TotalCost:</label> 
+                <InputNumber id="totalcost" @bind-Value="Trip.TotalCost" class="form-control" /> 
+                <ValidationMessage For="() => Trip.TotalCost" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isbusinesstrip" class="form-label">IsBusinessTrip:</label> 
+                <InputCheckbox id="isbusinesstrip" @bind-Value="Trip.IsBusinessTrip" class="form-check-input" /> 
+                <ValidationMessage For="() => Trip.IsBusinessTrip" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label> 
+                <InputSelect id="status" @bind-Value="Trip.Status" class="form-control">
+    @foreach (var status in Enum.GetValues<Travels.Models.TripStatus>())
+    {
+        <option value="@status">@status</option>
+    }
+</InputSelect> 
+                <ValidationMessage For="() => Trip.Status" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/trips">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Trip Trip { get; set; } = default!;
+
+    protected override void OnInitialized() => Trip ??= new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddTrip()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Trips.Add(Trip);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/trips");
+    }
+}
