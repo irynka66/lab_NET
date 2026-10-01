@@ -1,4 +1,4 @@
-@page "/trips/details"
+@page "/transports/details"
 @using Microsoft.EntityFrameworkCore
 @using Travels.Models
 @inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
@@ -9,23 +9,26 @@
 <h1>Details</h1>
 
 <div>
-    <h2>Trip</h2>
+    <h2>Transport</h2>
     <hr />
-    @if (trip is null)
+    @if (transport is null)
     {
         <p><em>Loading...</em></p>
     }
     else {
-        <TripCard Trip="trip" Caption="Подробиці запису" />
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@transport.Name</dd>
+        </dl>
         <div>
-            <a href="@($"/trips/edit?id={trip.Id}")">Edit</a> |
-            <a href="@($"/trips")">Back to List</a>
+            <a href="@($"/transports/edit?id={transport.Id}")">Edit</a> |
+            <a href="@($"/transports")">Back to List</a>
         </div>
     }
 </div>
 
 @code {
-    private Trip? trip;
+    private Transport? transport;
 
     [SupplyParameterFromQuery]
     private int Id { get; set; }
@@ -33,13 +36,9 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        trip = await context.Trips.FirstOrDefaultAsync(m => m.Id == Id);
-        trip = await m.Trips
-    .Include(x => x.Country)
-    .Include(x => x.Transport)
-    .FirstOrDefaultAsync(m => m.Id == Id);
+        transport = await context.Transports.FirstOrDefaultAsync(m => m.Id == Id);
 
-        if (trip is null)
+        if (transport is null)
         {
             NavigationManager.NotFound();
         }

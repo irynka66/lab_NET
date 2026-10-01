@@ -33,6 +33,24 @@ else
                     <ValidationMessage For="() => Trip.Destination" class="text-danger" />
                 </div>
                 <div class="mb-3">
+                <label for="country" class="form-label">Країна:</label>
+                <InputSelect id="country" @bind-Value="Trip.CountryId" class="form-select">
+                    @foreach (var c in countries)
+                    {
+                        <option value="@c.Id">@c.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="transport" class="form-label">Транспорт:</label>
+                <InputSelect id="transport" @bind-Value="Trip.TransportId" class="form-select">
+                    @foreach (var t in transports)
+                    {
+                        <option value="@t.Id">@t.Name</option>
+                    }
+                </InputSelect>
+            </div>
+                <div class="mb-3">
                     <label for="description" class="form-label">Description:</label>
                     <InputText id="description" @bind-Value="Trip.Description" class="form-control" />
                     <ValidationMessage For="() => Trip.Description" class="text-danger" />
@@ -89,6 +107,10 @@ else
     {
         using var context = DbFactory.CreateDbContext();
         Trip ??= await context.Trips.FirstOrDefaultAsync(m => m.Id == Id);
+        trip = await m.Trips
+    .Include(x => x.Country)
+    .Include(x => x.Transport)
+    .FirstOrDefaultAsync(m => m.Id == Id);
 
         if (Trip is null)
         {
@@ -140,5 +162,15 @@ else
     {
         using var context = DbFactory.CreateDbContext();
         return context.Trips.Any(e => e.Id == id);
+    }
+
+    private List<Country> countries = new();
+    private List<Transport> transports = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var db = DbFactory.CreateDbContext();
+        countries = await db.Countries.OrderBy(c => c.Name).ToListAsync();
+        transports = await db.Transports.OrderBy(t => t.Name).ToListAsync();
     }
 }

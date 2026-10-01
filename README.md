@@ -10,3 +10,23 @@
 
 **Особливість проєкту:**
 Реалізація завантаження та показу зображень для записів (додавання фотографій з подорожей).
+
+## Діаграма класів
+```mermaid
+classDiagram
+    class Trip {
+        +int Id
+        +string Destination
+        +int CountryId
+        +int TransportId
+    }
+    class Country {
+        +int Id
+        +string Name
+    }
+    class Transport {
+        +int Id
+        +string Name
+    }
+    Country "1" <-- "many" Trip
+    Transport "1" <-- "many" Trip

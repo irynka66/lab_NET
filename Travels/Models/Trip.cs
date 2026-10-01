@@ -22,5 +22,11 @@ public class Trip
 
     public bool IsBusinessTrip { get; set; }
 
+    public int CountryId { get; set; }
+    public Country? Country { get; set; }
+
+    public int TransportId { get; set; }
+    public Transport? Transport { get; set; }
+
     public TripStatus Status { get; set; }
 }

@@ -6,6 +6,8 @@
     <div class="card-body">
         <h5 class="card-title">@Trip.Destination</h5>
         <p class="card-text">
+            <strong>Країна:</strong> @Trip.Country?.Name <br />
+            <strong>Транспорт:</strong> @Trip.Transport?.Name <br />
             <strong>Період:</strong> @Trip.StartDate.ToString("dd.MM.yyyy") — @Trip.EndDate.ToString("dd.MM.yyyy")<br />
             <strong>Вартість:</strong> @Trip.TotalCost грн
         </p>

@@ -13,6 +13,8 @@ builder.Services.AddDbContextFactory<TravelsContext>(o =>
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

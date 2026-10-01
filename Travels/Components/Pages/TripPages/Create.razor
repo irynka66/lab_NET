@@ -24,6 +24,24 @@
                 <label for="destination" class="form-label">Destination:</label> 
                 <InputText id="destination" @bind-Value="Trip.Destination" class="form-control" /> 
                 <ValidationMessage For="() => Trip.Destination" class="text-danger" /> 
+            </div>
+            <div class="mb-3">
+                <label for="country" class="form-label">Країна:</label>
+                <InputSelect id="country" @bind-Value="Trip.CountryId" class="form-select">
+                    @foreach (var c in countries)
+                    {
+                        <option value="@c.Id">@c.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="transport" class="form-label">Транспорт:</label>
+                <InputSelect id="transport" @bind-Value="Trip.TransportId" class="form-select">
+                    @foreach (var t in transports)
+                    {
+                        <option value="@t.Id">@t.Name</option>
+                    }
+                </InputSelect>
             </div>        
             <div class="mb-3">
                 <label for="description" class="form-label">Description:</label> 
@@ -102,4 +120,14 @@
 
     NavigationManager.NavigateTo("/trips");
 }
+
+private List<Country> countries = new();
+    private List<Transport> transports = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var db = DbFactory.CreateDbContext();
+        countries = await db.Countries.OrderBy(c => c.Name).ToListAsync();
+        transports = await db.Transports.OrderBy(t => t.Name).ToListAsync();
+    }
 }

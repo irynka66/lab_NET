@@ -14,7 +14,7 @@
     <a href="trips/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="@context.Trips.OrderBy(b => b.Id).Skip((CurrentPage - 1) * PageSize).Take(PageSize)">
+<QuickGrid Class="table" Items="@context.Trips.Include(x => x.Country).Include(x => x.Transport).OrderBy(b => b.Id).Skip((CurrentPage - 1) * PageSize).Take(PageSize)">
     <PropertyColumn Property="trip => trip.Destination" />
     <PropertyColumn Property="trip => trip.Description" />
     <PropertyColumn Property="trip => trip.StartDate" />
@@ -22,6 +22,8 @@
     <PropertyColumn Property="trip => trip.TotalCost" />
     <PropertyColumn Property="trip => trip.IsBusinessTrip" />
     <PropertyColumn Property="trip => trip.Status" />
+    <PropertyColumn Property="trip => trip.Country!.Name" Title="Країна" />
+<PropertyColumn Property="trip => trip.Transport!.Name" Title="Транспорт" />
 
     <TemplateColumn Context="trip">
         <a href="@($"trips/edit?id={trip.Id}")">Edit</a> |
