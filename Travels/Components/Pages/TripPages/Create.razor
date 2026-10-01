@@ -1,5 +1,6 @@
 @page "/trips/create"
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.Data.Sqlite
 @using Travels.Models
 @inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
 @inject NavigationManager NavigationManager
@@ -15,6 +16,10 @@
         <EditForm method="post" Model="Trip" OnValidSubmit="AddTrip" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
+            @if (error is not null)
+{
+    <div class="alert alert-danger mt-2">@error</div>
+}
             <div class="mb-3">
                 <label for="destination" class="form-label">Destination:</label> 
                 <InputText id="destination" @bind-Value="Trip.Destination" class="form-control" /> 
@@ -65,17 +70,36 @@
 </div>
 
 @code {
+    private string? error;
     [SupplyParameterFromForm]
     private Trip Trip { get; set; } = default!;
 
     protected override void OnInitialized() => Trip ??= new();
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task AddTrip()
+    public async Task AddTrip()
+{
+    error = null;
+
+    if (Trip.EndDate < Trip.StartDate)
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Trips.Add(Trip);
-        await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/trips");
+        error = "Дата завершення не може передувати даті початку поїздки";
+        return;
     }
+
+    using var context = DbFactory.CreateDbContext();
+    context.Trips.Add(Trip);
+
+    try
+    {
+        await context.SaveChangesAsync();
+    }
+    catch (DbUpdateException ex) when (ex.InnerException is SqliteException { SqliteExtendedErrorCode: 2067 })
+    {
+        error = "Поїздка в це місце на таку дату вже існує";
+        return;
+    }
+
+    NavigationManager.NavigateTo("/trips");
+}
 }

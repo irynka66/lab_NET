@@ -13,5 +13,9 @@ public class TravelsContext : DbContext
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<Trip>().Property(x => x.TotalCost).HasConversion<double>();
+
+        b.Entity<Trip>()
+         .HasIndex(x => new { x.Destination, x.StartDate })
+         .IsUnique();
     }
 }
