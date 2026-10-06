@@ -34,7 +34,7 @@
     {
         using var context = DbFactory.CreateDbContext();
         trip = await context.Trips.FirstOrDefaultAsync(m => m.Id == Id);
-        trip = await m.Trips
+        trip = await context.Trips
     .Include(x => x.Country)
     .Include(x => x.Transport)
     .FirstOrDefaultAsync(m => m.Id == Id);

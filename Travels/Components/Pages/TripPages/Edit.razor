@@ -105,16 +105,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        Trip ??= await context.Trips.FirstOrDefaultAsync(m => m.Id == Id);
-        trip = await m.Trips
-    .Include(x => x.Country)
-    .Include(x => x.Transport)
-    .FirstOrDefaultAsync(m => m.Id == Id);
+        using var db = DbFactory.CreateDbContext();
+        
+        countries = await db.Countries.OrderBy(c => c.Name).ToListAsync();
+        transports = await db.Transports.OrderBy(t => t.Name).ToListAsync();
+
+        Trip ??= await db.Trips
+            .Include(x => x.Country)
+            .Include(x => x.Transport)
+            .FirstOrDefaultAsync(m => m.Id == Id);
 
         if (Trip is null)
         {
-            NavigationManager.NotFound();
+            NavigationManager.NavigateTo("notfound");
         }
     }
 
@@ -122,6 +125,7 @@ else
     // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     public async Task UpdateTrip()
 {
+    Trip.DestinationSearch = Trip.Destination.ToLowerInvariant();
     error = null;
 
     if (Trip.EndDate < Trip.StartDate)
@@ -167,10 +171,5 @@ else
     private List<Country> countries = new();
     private List<Transport> transports = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        using var db = DbFactory.CreateDbContext();
-        countries = await db.Countries.OrderBy(c => c.Name).ToListAsync();
-        transports = await db.Transports.OrderBy(t => t.Name).ToListAsync();
-    }
+    
 }

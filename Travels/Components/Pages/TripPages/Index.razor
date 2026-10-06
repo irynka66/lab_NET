@@ -3,7 +3,6 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Travels.Models
 @using Travels.Data
-@implements IAsyncDisposable
 @inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
 
 <PageTitle>Index</PageTitle>
@@ -14,7 +13,32 @@
     <a href="trips/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="@context.Trips.Include(x => x.Country).Include(x => x.Transport).OrderBy(b => b.Id).Skip((CurrentPage - 1) * PageSize).Take(PageSize)">
+<form method="get" class="row g-2 mb-3">
+    <div class="col">
+        <input name="search" value="@Search" class="form-control" placeholder="Пошук за місцем" />
+    </div>
+    <div class="col">
+        <select name="countryId" class="form-select">
+            <option value="">Усі країни</option>
+            @foreach (var c in countries)
+            {
+                <option value="@c.Id" selected="@(CountryId == c.Id)">@c.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col">
+        <select name="sort" class="form-select">
+            <option value="">За місцем</option>
+            <option value="cost" selected="@(Sort == "cost")">За вартістю</option>
+            <option value="date" selected="@(Sort == "date")">За датою</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Шукати</button>
+    </div>
+</form>
+
+<QuickGrid Class="table" Items="@trips.Skip((CurrentPage - 1) * PageSize).Take(PageSize).AsQueryable()">
     <PropertyColumn Property="trip => trip.Destination" />
     <PropertyColumn Property="trip => trip.Description" />
     <PropertyColumn Property="trip => trip.StartDate" />
@@ -35,27 +59,60 @@
 <nav>
     @if (CurrentPage > 1)
     {
-        <a class="btn btn-outline-secondary" href="@($"trips?page={CurrentPage - 1}")">Назад</a>
+        <a class="btn btn-outline-secondary" href="@($"trips?page={CurrentPage - 1}&search={Search}&countryId={CountryId}&sort={Sort}")">Назад</a>
     }
     <span class="mx-2">Сторінка @CurrentPage</span>
-    @if (context.Trips.Count() > CurrentPage * PageSize)
+    @if (trips.Count() > CurrentPage * PageSize)
     {
-        <a class="btn btn-outline-secondary" href="@($"trips?page={CurrentPage + 1}")">Далі</a>
+        <a class="btn btn-outline-secondary" href="@($"trips?page={CurrentPage + 1}&search={Search}&countryId={CountryId}&sort={Sort}")">Далі</a>
     }
 </nav>
 
 @code {
 
+    [SupplyParameterFromQuery] public string? Search { get; set; }
+[SupplyParameterFromQuery] public int? CountryId { get; set; }
+[SupplyParameterFromQuery] public string? Sort { get; set; }
+
+private List<Trip> trips = new();
+private List<Country> countries = new();
+
+protected override async Task OnInitializedAsync()
+{
+    await using var db = await DbFactory.CreateDbContextAsync();
+    countries = await db.Countries.OrderBy(c => c.Name).ToListAsync();
+    trips = await LoadAsync();
+}
+
+private async Task<List<Trip>> LoadAsync()
+{
+    await using var db = await DbFactory.CreateDbContextAsync();
+    var q = db.Trips.Include(x => x.Country).Include(x => x.Transport).AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(Search))
+    {
+        var s = Search.ToLowerInvariant();
+        q = q.Where(x => x.DestinationSearch.Contains(s));
+    }
+
+    if (CountryId is int id)
+    {
+        q = q.Where(x => x.CountryId == id);
+    }
+
+    q = Sort switch
+    {
+        "cost" => q.OrderByDescending(x => x.TotalCost),
+        "date" => q.OrderByDescending(x => x.StartDate),
+        _ => q.OrderBy(x => x.Destination)
+    };
+
+    return await q.ToListAsync();
+}
+
 private const int PageSize = 10;
 [SupplyParameterFromQuery] public int? Page { get; set; }
 private int CurrentPage => Page is > 0 ? Page.Value : 1;
 
-    private TravelsContext context = default!;
 
-    protected override void OnInitialized()
-    {
-        context = DbFactory.CreateDbContext();
-    }
-
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

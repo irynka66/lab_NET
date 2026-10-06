@@ -8,6 +8,7 @@ public class Trip
     [Required(ErrorMessage = "Зазначте місце призначення")]
     [StringLength(150, ErrorMessage = "Назва місця задовга")]
     public string Destination { get; set; } = "";
+    public string DestinationSearch { get; set; } = "";
 
     public string? Description { get; set; }
 
