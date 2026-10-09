@@ -5,7 +5,7 @@
 @inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Нова поїздка — Travels</PageTitle>
 
 <h1>Create</h1>
 
@@ -21,7 +21,7 @@
     <div class="alert alert-danger mt-2">@error</div>
 }
             <div class="mb-3">
-                <label for="destination" class="form-label">Destination:</label> 
+                <label for="destination" class="form-label">Місце призначення:</label> 
                 <InputText id="destination" @bind-Value="Trip.Destination" class="form-control" /> 
                 <ValidationMessage For="() => Trip.Destination" class="text-danger" /> 
             </div>
@@ -44,32 +44,32 @@
                 </InputSelect>
             </div>        
             <div class="mb-3">
-                <label for="description" class="form-label">Description:</label> 
+                <label for="description" class="form-label">Опис:</label> 
                 <InputText id="description" @bind-Value="Trip.Description" class="form-control" /> 
                 <ValidationMessage For="() => Trip.Description" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="startdate" class="form-label">StartDate:</label> 
+                <label for="startdate" class="form-label">Дата початку:</label> 
                 <InputDate id="startdate" @bind-Value="Trip.StartDate" class="form-control" /> 
                 <ValidationMessage For="() => Trip.StartDate" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="enddate" class="form-label">EndDate:</label> 
+                <label for="enddate" class="form-label">Дата завершення:</label> 
                 <InputDate id="enddate" @bind-Value="Trip.EndDate" class="form-control" /> 
                 <ValidationMessage For="() => Trip.EndDate" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="totalcost" class="form-label">TotalCost:</label> 
+                <label for="totalcost" class="form-label">Загальна вартість:</label> 
                 <InputNumber id="totalcost" @bind-Value="Trip.TotalCost" class="form-control" /> 
                 <ValidationMessage For="() => Trip.TotalCost" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="isbusinesstrip" class="form-label">IsBusinessTrip:</label> 
+                <label for="isbusinesstrip" class="form-label">Це ділова поїздка:</label> 
                 <InputCheckbox id="isbusinesstrip" @bind-Value="Trip.IsBusinessTrip" class="form-check-input" /> 
                 <ValidationMessage For="() => Trip.IsBusinessTrip" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="status" class="form-label">Status:</label> 
+                <label for="status" class="form-label">Статус:</label> 
                 <InputSelect id="status" @bind-Value="Trip.Status" class="form-control">
     @foreach (var status in Enum.GetValues<Travels.Models.TripStatus>())
     {

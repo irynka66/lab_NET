@@ -5,12 +5,12 @@
 @using Travels.Data
 @inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Поїздки — Travels</PageTitle>
 
-<h1>Index</h1>
+<h1>Поїздки</h1>
 
 <p>
-    <a href="trips/create">Create New</a>
+    <a href="trips/create">Створити поїздку</a>
 </p>
 
 <form method="get" class="row g-2 mb-3">
@@ -38,23 +38,38 @@
     </div>
 </form>
 
+@if (!trips.Any())
+{
+    <div class="alert alert-info mt-3">
+        Записів про поїздки ще немає.
+        <a href="/trips/create">Додайте першу поїздку</a>.
+    </div>
+}
+else
+{
+
+    <div class="table-responsive">
+
 <QuickGrid Class="table" Items="@trips.Skip((CurrentPage - 1) * PageSize).Take(PageSize).AsQueryable()">
-    <PropertyColumn Property="trip => trip.Destination" />
-    <PropertyColumn Property="trip => trip.Description" />
-    <PropertyColumn Property="trip => trip.StartDate" />
-    <PropertyColumn Property="trip => trip.EndDate" />
-    <PropertyColumn Property="trip => trip.TotalCost" />
-    <PropertyColumn Property="trip => trip.IsBusinessTrip" />
-    <PropertyColumn Property="trip => trip.Status" />
-    <PropertyColumn Property="trip => trip.Country!.Name" Title="Країна" />
-<PropertyColumn Property="trip => trip.Transport!.Name" Title="Транспорт" />
+    <PropertyColumn Property="trip => trip.Destination" Title="Місце призначення"  />
+<PropertyColumn Property="trip => trip.Description" Title="Опис" Class="d-none d-md-table-cell" />
+<PropertyColumn Property="trip => trip.StartDate" Title="Дата початку" Class="d-none d-md-table-cell" />
+<PropertyColumn Property="trip => trip.EndDate" Title="Дата завершення" Class="d-none d-md-table-cell" />
+<PropertyColumn Property="trip => trip.TotalCost" Title="Вартість (грн)"  />
+<PropertyColumn Property="trip => trip.IsBusinessTrip" Title="Відрядження" Class="d-none d-md-table-cell" />
+<PropertyColumn Property="trip => trip.Status" Title="Статус" Class="d-none d-md-table-cell" />
+    <PropertyColumn Property="trip => trip.Country!.Name" Title="Країна" Class="d-none d-md-table-cell" />
+<PropertyColumn Property="trip => trip.Transport!.Name" Title="Транспорт" Class="d-none d-md-table-cell" />
 
     <TemplateColumn Context="trip">
-        <a href="@($"trips/edit?id={trip.Id}")">Edit</a> |
-        <a href="@($"trips/details?id={trip.Id}")">Details</a> |
-        <a href="@($"trips/delete?id={trip.Id}")">Delete</a>
+        <a href="@($"trips/edit?id={trip.Id}")">Редагувати</a> |
+        <a href="@($"trips/details?id={trip.Id}")">Деталі</a> |
+        <a href="@($"trips/delete?id={trip.Id}")">Видалити</a>
     </TemplateColumn>
 </QuickGrid>
+</div>
+
+
 
 <nav>
     @if (CurrentPage > 1)
@@ -67,6 +82,8 @@
         <a class="btn btn-outline-secondary" href="@($"trips?page={CurrentPage + 1}&search={Search}&countryId={CountryId}&sort={Sort}")">Далі</a>
     }
 </nav>
+
+}
 
 @code {
 

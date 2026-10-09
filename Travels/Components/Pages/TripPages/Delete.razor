@@ -4,13 +4,13 @@
 @inject IDbContextFactory<Travels.Data.TravelsContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Delete</PageTitle>
+<PageTitle>Видалення поїздки — Travels</PageTitle>
 
-<h1>Delete</h1>
+<h1>Видалення поїздки</h1>
 
-<p>Are you sure you want to delete this?</p>
+<p>Ви впевнені, що хочете видалити цю поїздку?</p>
 <div>
-    <h2>Trip</h2>
+    <h2>Видалити «@(trip?.Destination)»?</h2>
     <hr />
     @if (trip is null)
     {
