@@ -1,0 +1,61 @@
+@page "/summary"
+@using Microsoft.EntityFrameworkCore
+@using Travels.Data
+@using Travels.Services
+@inject IDbContextFactory<TravelsContext> DbFactory
+
+<PageTitle>Зведення</PageTitle>
+
+<h1>Зведення за поїздками</h1>
+
+@if (total.Count == 0)
+{
+    <div class="alert alert-info mt-3">
+        Записів про поїздки ще немає, тому підсумовувати нема чого.
+        <a href="/trips/create">Додайте першу поїздку</a>.
+    </div>
+}
+else
+{
+    <h2 class="mt-4">За країнами</h2>
+    <table class="table table-bordered">
+        <thead class="table-light"><tr><th>Країна</th><th>Кількість поїздок</th><th>Сума витрат (грн)</th></tr></thead>
+        <tbody>
+            @foreach (var r in byCountry)
+            {
+                <tr><td>@r.Name</td><td>@r.Count</td><td>@r.Total</td></tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="table-secondary fw-bold">
+                <td>@total.Name</td><td>@total.Count</td><td>@total.Total</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h2 class="mt-4">За періодами (місяць.рік)</h2>
+    <table class="table table-bordered">
+        <thead class="table-light"><tr><th>Період</th><th>Кількість поїздок</th><th>Сума витрат (грн)</th></tr></thead>
+        <tbody>
+            @foreach (var r in byMonth)
+            {
+                <tr><td>@r.Name</td><td>@r.Count</td><td>@r.Total</td></tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SummaryRow> byCountry = new();
+    private List<SummaryRow> byMonth = new();
+    private SummaryRow total = new("Усього", 0, 0);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        byCountry = await SummaryCalculator.ByCountryAsync(db.Trips);
+        byMonth = await SummaryCalculator.ByMonthAsync(db.Trips);
+        total = await SummaryCalculator.TotalAsync(db.Trips);
+    }
+}

@@ -8,14 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDbContextFactory<TravelsContext>(o =>
-    o.UseSqlite("Data Source=travels.db"));
+builder.Services.AddDbContextFactory<TravelsContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("TravelsContext") ?? throw new InvalidOperationException("Connection string 'TravelsContext' not found."))
+           );
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 
 
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
